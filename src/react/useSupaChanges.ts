@@ -1,5 +1,5 @@
 import { useContext } from "react"
-import { SupaChangesContext, UnknownStore } from "./SupaChangesContext.ts"
+import { SupaChangesContext, UnknownStore } from "./SupaChangesContext"
 
 export const useSupaChanges = <T extends UnknownStore>() => {
     const context = useContext(SupaChangesContext)

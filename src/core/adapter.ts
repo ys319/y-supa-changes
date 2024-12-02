@@ -1,10 +1,9 @@
+import { decodeAscii85, decodeBase64, encodeAscii85, encodeBase64 } from "@std/encoding"
 import { REALTIME_SUBSCRIBE_STATES, RealtimeChannel, SupabaseClient } from "@supabase/supabase-js"
-import { decodeAscii85, encodeAscii85 } from "https://deno.land/std@0.224.0/encoding/ascii85.ts"
-import { decodeBase64, encodeBase64 } from "https://deno.land/std@0.224.0/encoding/base64.ts"
 import { Doc, applyUpdate, applyUpdateV2 } from "yjs"
-import { Database } from "../database.generated.ts"
-import { compress, decompress } from "./compress.ts"
-import { YjsCompress, YjsEncoding, YjsVersion } from "./metadata.ts"
+import { Database } from "../database.generated"
+import { compress, decompress } from "./compress"
+import { YjsCompress, YjsEncoding, YjsVersion } from "./metadata"
 
 type RealtimePayload = Database["y_supa_changes"]["Tables"]["updates"]["Insert"]
 
@@ -161,7 +160,7 @@ export class SupaChangesAdapter {
 
         // Apply all updates in order
         for (const payload of data) {
-            if (typeof payload !== "string") {
+            if (typeof payload.update !== "string") {
                 console.warn("Failed to apply update: ", payload);
                 continue
             }

@@ -1,8 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js"
 import type { Doc } from "yjs"
-import type { Database } from "../database.generated.ts"
-import { roomMetadataSchema } from "./metadata.ts"
-import { SupaChangesAdapter } from "./SupaChangesAdapter.ts"
+import type { Database } from "../database.generated"
+import { SupaChangesAdapter } from "./adapter"
+import { roomMetadataSchema } from "./metadata"
 
 export const createSupaChangesAdapter = async (
     supabase: SupabaseClient<Database>,
