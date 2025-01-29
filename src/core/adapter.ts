@@ -52,13 +52,14 @@ export class SupaChangesAdapter {
         }
     }
 
-    // Encoder & Decoder
+    // Encoder
     private encodeUpdate(data: Uint8Array): string {
         if (this.#yjs_encoding === "base64") return encodeBase64(data)
         else if (this.#yjs_encoding === "ascii85") return encodeAscii85(data)
         else throw new Error(`Unknown data encoding: ${this.#yjs_encoding}`)
     }
 
+    // Decoder
     private decodeUpdate(data: string): Uint8Array {
         if (this.#yjs_encoding === "base64") return decodeBase64(data)
         else if (this.#yjs_encoding === "ascii85") return decodeAscii85(data)
@@ -81,6 +82,7 @@ export class SupaChangesAdapter {
         }
     }
 
+    // Decompress
     private async decodeUpdateWithCompress(data: string): Promise<Uint8Array> {
         switch (this.#yjs_compress) {
             case "deflate-raw":
@@ -105,12 +107,14 @@ export class SupaChangesAdapter {
         }
     }
 
-    public async initialize() {
+    public async initialize(signal: AbortSignal) {
+
+        // Abort on aborted
+        if (signal.aborted) return
 
         // Subscribe to realtime updates
-        const channelName = `${this.#channel}:${this.#room_id}:crdt`
-        // @ts-ignore
         const subscribed = Promise.withResolvers<`${REALTIME_SUBSCRIBE_STATES}`>()
+        const channelName = `${this.#channel}:${this.#room_id}:crdt`
         this.#subscription = this.#supabase
             .channel(channelName)
             .on<RealtimePayload>(
@@ -122,7 +126,7 @@ export class SupaChangesAdapter {
                     filter: `room_id=eq.${this.#room_id}`
                 },
                 (payload) => {
-                    // Ignore merged update
+                    // Ignore checkpoint
                     if (payload.new.checkpoint === true) return
                     // Ignore empty update
                     if (payload.new.update === undefined) return
@@ -130,21 +134,29 @@ export class SupaChangesAdapter {
                     this.applyUpdate(payload.new)
                 }
             )
-            .subscribe((status) => subscribed.resolve(status))
+            .subscribe(async (status) => {
+                subscribed.resolve(status)
+            })
 
         // Wait for subscribe.
         const status = await subscribed.promise
+        if (status !== "SUBSCRIBED") {
+            this.destroy()
+            throw new Error("Failed to subscribe database.")
+        }
 
-        if (status === "SUBSCRIBED") {
-            // Get remote status.
-            await this.syncInitialState()
-        } else {
+        // Get remote status.
+        const success = await this.syncInitialState(signal)
+        if (!success) {
             this.destroy()
             throw new Error("Failed to subscribe database.")
         }
     }
 
-    private async syncInitialState() {
+    private async syncInitialState(signal: AbortSignal) {
+
+        // Abort on aborted
+        if (signal.aborted) return false
 
         // Fetch all existing updates ordered by autoincrement id
         const { data, error } = await this.#supabase
@@ -153,19 +165,25 @@ export class SupaChangesAdapter {
             .select("update")
             .eq("room_id", this.#room_id)
             .order("id")
+            .abortSignal(signal)
 
+        // Case: Failed to fetch state.
         if (error !== null) {
-            throw error
+            console.warn(error)
+            return false
         }
 
         // Apply all updates in order
         for (const payload of data) {
             if (typeof payload.update !== "string") {
-                console.warn("Failed to apply update: ", payload);
+                console.warn("Failed to apply update: ", payload)
                 continue
             }
             await this.applyUpdate(payload)
         }
+
+        // Succeed
+        return true
     }
 
     private async updateHandler(update: Uint8Array, origin: SupaChangesAdapter) {

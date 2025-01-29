@@ -1,5 +1,5 @@
 import { SupabaseClient } from "@supabase/supabase-js"
-import { createElement, PropsWithChildren, ReactNode, useCallback, useEffect, useState } from "react"
+import { createElement, PropsWithChildren, ReactNode, useEffect, useState } from "react"
 import { proxy } from "valtio"
 import { bind } from "valtio-yjs"
 import { Doc } from "yjs"
@@ -30,46 +30,50 @@ export const SupaChangesContextProvider = <T extends UnknownStore>({
         provider: SupaChangesAdapter
     }>()
 
-    const connect = useCallback(async () => {
+    useEffect(() => {
 
         // Reset state.
         setState(undefined)
 
-        // Create provider.
+        // Prepare proxy store.
         const store = proxy<T>()
         const ydoc = new Doc()
-        const ymap = ydoc.getMap('data')
-        const provider = await createSupaChangesAdapter(supabase, room, ydoc)
+        const ymap = ydoc.getMap()
 
-        // Try to initialize.
-        try {
-            await provider.initialize()
-            // Initialize store.
-            if (typeof storeInitFn === "function") {
-                storeInitFn(store)
-            }
-        } catch (error) {
-            // This error is safe.
-            console.warn(error)
+        // Make abortable.
+        const controller = new AbortController()
+        const signal = controller.signal
+
+        // Create provider.
+        createSupaChangesAdapter(supabase, room, ydoc)
+            .then(async (provider) => {
+
+                // Try to initialize.
+                try {
+                    await provider.initialize(signal)
+                } catch (error) {
+                    // This error is safe.
+                    console.warn(error)
+                }
+
+                // Bind valtio store to yjs doc.
+                const unbind = bind(store, ymap)
+
+                // Initialize store.
+                if (typeof storeInitFn === "function") {
+                    storeInitFn(store)
+                }
+
+                // Done.
+                setState({ store, ydoc, provider, unbind })
+            })
+
+        return () => {
+            controller.abort()
+            state?.provider.destroy()
+            state?.unbind()
         }
-
-        // Bind valtio store to yjs doc.
-        const unbind = bind(store, ymap)
-
-        // Done.
-        setState({ store, ydoc, provider, unbind })
     }, [room, storeInitFn, supabase])
-
-    // Connect.
-    useEffect(() => {
-        connect()
-    }, [connect])
-
-    // Cleanup.
-    useEffect(() => () => {
-        state?.provider.destroy()
-        state?.unbind()
-    }, [state])
 
     // Case: Return loading component when not ready.
     if (state === undefined) {

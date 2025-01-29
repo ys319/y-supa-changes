@@ -29,7 +29,7 @@
 
   -- Create
   CREATE TYPE "y_supa_changes"."room_permission" AS ENUM ('read', 'write');
-  CREATE TYPE "y_supa_changes"."yjs_compress" AS ENUM ('none', 'gzip', 'deflate');
+  CREATE TYPE "y_supa_changes"."yjs_compress" AS ENUM ('none', 'gzip', 'deflate', 'deflate-raw');
   CREATE TYPE "y_supa_changes"."yjs_encoding" AS ENUM ('ascii85', 'base64');
   CREATE TYPE "y_supa_changes"."yjs_version" AS ENUM ('v1', 'v2');
 
