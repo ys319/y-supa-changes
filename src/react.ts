@@ -1,3 +1,2 @@
-// React + valtio(y-valtio)
-export { SupaChangesContextProvider } from "./react/SupaChangesContextProvider"
-export { useSupaChanges } from "./react/useSupaChanges"
+export { SupaChangesContextProvider } from "./react/SupaChangesContextProvider.ts"
+export { useSupaChanges } from "./react/useSupaChanges.ts"

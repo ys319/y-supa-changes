@@ -3,10 +3,10 @@ import { createElement, PropsWithChildren, ReactNode, useEffect, useState } from
 import { proxy } from "valtio"
 import { bind } from "valtio-yjs"
 import { Doc } from "yjs"
-import { SupaChangesAdapter } from "../core/adapter"
-import { createSupaChangesAdapter } from "../core/helper.js"
-import { Database } from "../database.generated"
-import { SupaChangesContext, UnknownStore } from "./SupaChangesContext"
+import { SupaChangesAdapter } from "../core/adapter.ts"
+import { createSupaChangesAdapter } from "../core/helper.ts"
+import { Database } from "../database.generated.ts"
+import { SupaChangesContext, UnknownStore } from "./SupaChangesContext.ts"
 
 export type Props<T extends UnknownStore> = PropsWithChildren<{
     supabase: SupabaseClient<Database>
