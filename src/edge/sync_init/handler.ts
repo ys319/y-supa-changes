@@ -4,12 +4,21 @@ import type { Database } from "./database.ts"
 import { roomMetadataSchema } from "./metadata.ts"
 import { decode_with_compress, encode_with_compress } from "./utils.ts"
 
+const corsHeaders = {
+    'Access-Control-Allow-Origin': '*'
+}
+
 type Supa = SupabaseClient<Database, "y_supa_changes", Database["y_supa_changes"]>
 
 export const sync_init_handler = (supabaseUrl: string, supabaseKey: string): Deno.ServeHandler<Deno.NetAddr> => {
     const supabase: Supa = new SupabaseClient(supabaseUrl, supabaseKey)
 
     return async (req: Request) => {
+
+        // Handle preflight
+        if (req.method === 'OPTIONS') {
+            return new Response('ok', { headers: corsHeaders })
+        }
 
         // Get room from body
         const { room_id } = await req.json()
@@ -125,7 +134,7 @@ export const sync_init_handler = (supabaseUrl: string, supabaseKey: string): Den
         return new Response(
             JSON.stringify({ update }),
             {
-                headers: { "Content-Type": "application/json" },
+                headers: { ...corsHeaders, "Content-Type": "application/json" },
                 status: 200,
                 statusText: "Success."
             }
