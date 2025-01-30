@@ -1,6 +1,6 @@
 import { SupabaseClient } from "@supabase/supabase-js"
 import { applyUpdate, applyUpdateV2, Doc, encodeStateAsUpdate, encodeStateAsUpdateV2 } from "yjs"
-import { Database } from "./database.ts"
+import type { Database } from "./database.ts"
 import { roomMetadataSchema } from "./metadata.ts"
 import { decode_with_compress, encode_with_compress } from "./utils.ts"
 

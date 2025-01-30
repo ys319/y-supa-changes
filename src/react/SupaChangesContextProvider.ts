@@ -1,12 +1,12 @@
-import { SupabaseClient } from "@supabase/supabase-js"
-import { createElement, PropsWithChildren, ReactNode, useEffect, useState } from "react"
+import type { SupabaseClient } from "@supabase/supabase-js"
+import { createElement, type PropsWithChildren, type ReactNode, useEffect, useState } from "react"
 import { proxy } from "valtio"
 import { bind } from "valtio-yjs"
 import { Doc } from "yjs"
-import { SupaChangesAdapter } from "../core/adapter.ts"
+import type { SupaChangesAdapter } from "../core/adapter.ts"
 import { createSupaChangesAdapter } from "../core/helper.ts"
-import { Database } from "../database.generated.ts"
-import { SupaChangesContext, UnknownStore } from "./SupaChangesContext.ts"
+import type { Database } from "../database.generated.ts"
+import { SupaChangesContext, type UnknownStore } from "./SupaChangesContext.ts"
 
 export type Props<T extends UnknownStore> = PropsWithChildren<{
     supabase: SupabaseClient<Database>
@@ -21,7 +21,7 @@ export const SupaChangesContextProvider = <T extends UnknownStore>({
     room,
     storeInitFn,
     Loading,
-}: Props<T>) => {
+}: Props<T>): ReactNode => {
 
     const [state, setState] = useState<{
         store: T

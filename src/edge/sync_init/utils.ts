@@ -1,6 +1,6 @@
 import base64 from "@protobufjs/base64"
 import { deflateSync, gunzipSync, gzipSync, inflateSync } from "fflate"
-import { Compress } from "./metadata.ts"
+import type { Compress } from "./metadata.ts"
 
 export const base64_encode = (data: Uint8Array) => base64.encode(data, 0, data.length)
 
