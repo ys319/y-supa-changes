@@ -6,6 +6,7 @@
     "jsr:@std/internal@^1.0.5": "1.0.5",
     "npm:@protobufjs/base64@^1.1.2": "1.1.2",
     "npm:@supabase/supabase-js@^2.48.1": "2.48.1",
+    "npm:@types/node@*": "22.5.4",
     "npm:fflate@~0.8.2": "0.8.2",
     "npm:react@19": "19.0.0",
     "npm:valtio-yjs@0.6": "0.6.0_valtio@2.1.3__react@19.0.0_react@19.0.0",

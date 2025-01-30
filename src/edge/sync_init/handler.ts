@@ -4,21 +4,12 @@ import type { Database } from "./database.ts"
 import { roomMetadataSchema } from "./metadata.ts"
 import { decode_with_compress, encode_with_compress } from "./utils.ts"
 
-const corsHeaders = {
-    'Access-Control-Allow-Origin': '*'
-}
-
 type Supa = SupabaseClient<Database, "y_supa_changes", Database["y_supa_changes"]>
 
 export const sync_init_handler = (supabaseUrl: string, supabaseKey: string): Deno.ServeHandler<Deno.NetAddr> => {
     const supabase: Supa = createClient(supabaseUrl, supabaseKey)
 
     return async (req: Request) => {
-
-        // Handle preflight
-        if (req.method === 'OPTIONS') {
-            return new Response('ok', { headers: corsHeaders })
-        }
 
         // Get room from body
         const { room_id } = await req.json()
@@ -39,7 +30,7 @@ export const sync_init_handler = (supabaseUrl: string, supabaseKey: string): Den
         const metadata = await supabase
             .schema("y_supa_changes")
             .from("rooms")
-            .select("compress,yjs_version")
+            .select("yjs_compress,yjs_encoding,yjs_version")
             .eq("id", room_id)
             .single()
 
@@ -69,7 +60,7 @@ export const sync_init_handler = (supabaseUrl: string, supabaseKey: string): Den
         }
 
         // Get room metadata.
-        const { compress, yjs_version } = parsed.data
+        const { yjs_compress, yjs_encoding, yjs_version } = parsed.data
 
         // Get all updates from room.
         const updates = await supabase
@@ -95,9 +86,9 @@ export const sync_init_handler = (supabaseUrl: string, supabaseKey: string): Den
         const ydoc = new Doc()
         for (const { update } of updates.data) {
             if (yjs_version === "v1") {
-                applyUpdate(ydoc, decode_with_compress(update, compress))
+                applyUpdate(ydoc, decode_with_compress(update, yjs_compress, yjs_encoding))
             } else if (yjs_version === "v2") {
-                applyUpdateV2(ydoc, decode_with_compress(update, compress))
+                applyUpdateV2(ydoc, decode_with_compress(update, yjs_compress, yjs_encoding))
             }
         }
 
@@ -110,7 +101,7 @@ export const sync_init_handler = (supabaseUrl: string, supabaseKey: string): Den
         } else {
             throw new Error(`Unknown yjs version: ${yjs_version}`)
         }
-        const update = encode_with_compress(encoded, compress)
+        const update = encode_with_compress(encoded, yjs_compress, yjs_encoding)
 
         // // Insert checkpoint to database.
         // await supabase
@@ -134,7 +125,7 @@ export const sync_init_handler = (supabaseUrl: string, supabaseKey: string): Den
         return new Response(
             JSON.stringify({ update }),
             {
-                headers: { ...corsHeaders, "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json" },
                 status: 200,
                 statusText: "Success."
             }
