@@ -1,4 +1,4 @@
-import { SupabaseClient } from "@supabase/supabase-js"
+import { createClient, type SupabaseClient } from "@supabase/supabase-js"
 import { applyUpdate, applyUpdateV2, Doc, encodeStateAsUpdate, encodeStateAsUpdateV2 } from "yjs"
 import type { Database } from "./database.ts"
 import { roomMetadataSchema } from "./metadata.ts"
@@ -11,7 +11,7 @@ const corsHeaders = {
 type Supa = SupabaseClient<Database, "y_supa_changes", Database["y_supa_changes"]>
 
 export const sync_init_handler = (supabaseUrl: string, supabaseKey: string): Deno.ServeHandler<Deno.NetAddr> => {
-    const supabase: Supa = new SupabaseClient(supabaseUrl, supabaseKey)
+    const supabase: Supa = createClient(supabaseUrl, supabaseKey)
 
     return async (req: Request) => {
 
