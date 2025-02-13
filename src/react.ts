@@ -1,2 +1,2 @@
-export { SupaChangesContextProvider } from "./react/SupaChangesContextProvider.ts"
-export { useSupaChanges } from "./react/useSupaChanges.ts"
+export { SupaChangesContextProvider } from "./react/SupaChangesContextProvider"
+export { useSupaChanges } from "./react/useSupaChanges"

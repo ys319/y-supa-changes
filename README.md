@@ -4,12 +4,6 @@ Supabase postgres changes provider for yjs.
 
 ## Install
 
-write jsr registry to `.npmrc`.
-
-```
-@jsr:registry=https://npm.jsr.io
-```
-
 ## Exports
 
 - Core

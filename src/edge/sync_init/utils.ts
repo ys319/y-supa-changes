@@ -1,6 +1,6 @@
 import { decodeAscii85, decodeBase64, encodeAscii85, encodeBase64 } from "@std/encoding"
 import { deflateSync, gunzipSync, gzipSync, inflateSync } from "fflate"
-import type { YjsCompress, YjsEncoding } from "./metadata.ts"
+import type { YjsCompress, YjsEncoding } from "./metadata"
 
 export const encode_update = (data: Uint8Array, encoding: YjsEncoding): string => {
     if (encoding === "base64") return encodeBase64(data)

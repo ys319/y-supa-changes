@@ -1,12 +1,14 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js"
 import { applyUpdate, applyUpdateV2, Doc, encodeStateAsUpdate, encodeStateAsUpdateV2 } from "yjs"
-import type { Database } from "./database.ts"
-import { roomMetadataSchema } from "./metadata.ts"
-import { decode_with_compress, encode_with_compress } from "./utils.ts"
+import type { Database } from "./database"
+import { roomMetadataSchema } from "./metadata"
+import { decode_with_compress, encode_with_compress } from "./utils"
 
 type Supa = SupabaseClient<Database, "y_supa_changes", Database["y_supa_changes"]>
 
-export const sync_init_handler = (supabaseUrl: string, supabaseKey: string): Deno.ServeHandler<Deno.NetAddr> => {
+type Handler = (req: Request) => Promise<Response>
+
+export const sync_init_handler = (supabaseUrl: string, supabaseKey: string): Handler => {
     const supabase: Supa = createClient(supabaseUrl, supabaseKey)
 
     return async (req: Request) => {
@@ -101,25 +103,26 @@ export const sync_init_handler = (supabaseUrl: string, supabaseKey: string): Den
         } else {
             throw new Error(`Unknown yjs version: ${yjs_version}`)
         }
+
         const update = encode_with_compress(encoded, yjs_compress, yjs_encoding)
 
-        // // Insert checkpoint to database.
-        // await supabase
-        //     .schema("y_supa_changes")
-        //     .from("updates")
-        //     .insert({
-        //         update,
-        //         room_id,
-        //         checkpoint: true,
-        //     })
+        // Insert checkpoint to database.
+        await supabase
+            .schema("y_supa_changes")
+            .from("updates")
+            .insert({
+                update,
+                room_id,
+                checkpoint: true,
+            })
 
-        // // Delete merged update.
-        // const merged_ids = updates.data.map(datum => datum.id)
-        // await supabase
-        //     .schema("y_supa_changes")
-        //     .from("updates")
-        //     .delete()
-        //     .in("id", merged_ids)
+        // Delete merged update.
+        const merged_ids = updates.data.map(datum => datum.id)
+        await supabase
+            .schema("y_supa_changes")
+            .from("updates")
+            .delete()
+            .in("id", merged_ids)
 
         // OK.
         return new Response(

@@ -1,0 +1,69 @@
+{
+  "name": "@ys319/y-supa-changes",
+  "description": "Yjs provider for Supabase Postgres Changes",
+  "version": "0.2.1",
+  "license": "MIT",
+  "homepage": "https://github.com/ys319/y-supa-changes",
+  "repository": {
+    "type": "git",
+    "url": "github:ys319/y-supa-changes"
+  },
+  "bugs": {
+    "url": "https://github.com/ys319/y-supa-changes/issues"
+  },
+  "author": "Yoshimasa Kuroyama",
+  "keywords": [
+    "yjs",
+    "supabase"
+  ],
+  "files": [
+    "dist",
+    "NOTICE.md"
+  ],
+  "module": "./dist/mod.mjs",
+  "types": "./dist/mod.d.mts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/mod.d.mts",
+        "default": "./dist/mod.mjs"
+      }
+    },
+    "./react": {
+      "import": {
+        "types": "./dist/react.d.mts",
+        "default": "./dist/react.mjs"
+      }
+    },
+    "./edge": {
+      "import": {
+        "types": "./dist/edge.d.mts",
+        "default": "./dist/edge.mjs"
+      }
+    }
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.48.1",
+    "fflate": "^0.8.2",
+    "valtio-yjs": "^0.6.0",
+    "yjs": "^13.6.23",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@std/encoding": "npm:@jsr/std__encoding@^1.0.7",
+    "@tsconfig/recommended": "^1.0.8",
+    "@types/deno": "^2.0.0",
+    "@types/react": "^18.3.18",
+    "tsup": "^8.3.6",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1",
+    "valtio": "^2.1.2"
+  },
+  "scripts": {
+    "check": "tsc --noEmit",
+    "build": "tsup"
+  }
+}

@@ -1,9 +1,9 @@
 import { decodeAscii85, decodeBase64, encodeAscii85, encodeBase64 } from "@std/encoding"
 import type { REALTIME_SUBSCRIBE_STATES, RealtimeChannel, SupabaseClient } from "@supabase/supabase-js"
 import { type Doc, applyUpdate, applyUpdateV2 } from "yjs"
-import type { Database } from "../database.generated.ts"
-import { compress, decompress } from "./compress.ts"
-import type { YjsCompress, YjsEncoding, YjsVersion } from "./metadata.ts"
+import type { Database } from "../database.generated"
+import { compress, decompress } from "./compress"
+import type { YjsCompress, YjsEncoding, YjsVersion } from "./metadata"
 
 type RealtimePayload = Database["y_supa_changes"]["Tables"]["updates"]["Insert"]
 

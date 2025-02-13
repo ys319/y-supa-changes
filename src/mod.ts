@@ -1,2 +1,2 @@
-export { SupaChangesAdapter } from "./core/adapter.ts"
-export { createSupaChangesAdapter } from "./core/helper.ts"
+export { SupaChangesAdapter } from "./core/adapter"
+export { createSupaChangesAdapter } from "./core/helper"

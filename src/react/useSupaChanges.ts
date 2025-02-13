@@ -1,6 +1,6 @@
 import { useContext } from "react"
 import type { Doc } from "yjs"
-import { SupaChangesContext, type UnknownStore } from "./SupaChangesContext.ts"
+import { SupaChangesContext, type UnknownStore } from "./SupaChangesContext"
 
 export const useSupaChanges = <T extends UnknownStore>(): {
     store: T
