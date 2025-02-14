@@ -56,6 +56,9 @@ export const SupaChangesContextProvider = <T extends UnknownStore>({
                     console.warn(error)
                 }
 
+                // Aborted?
+                if (signal.aborted) return
+
                 // Bind valtio store to yjs doc.
                 const unbind = bind(store, ymap)
 
@@ -70,8 +73,8 @@ export const SupaChangesContextProvider = <T extends UnknownStore>({
 
         return () => {
             controller.abort()
-            state?.provider.destroy()
             state?.unbind()
+            state?.provider.destroy()
         }
     }, [room, storeInitFn, supabase])
 
