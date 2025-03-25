@@ -1,12 +1,12 @@
-import { SupabaseClient } from "@supabase/supabase-js"
-import { createElement, PropsWithChildren, ReactNode, useEffect, useState } from "react"
+import type { SupabaseClient } from "@supabase/supabase-js"
+import { createElement, type PropsWithChildren, type ReactNode, useEffect, useState } from "react"
 import { proxy } from "valtio"
 import { bind } from "valtio-yjs"
 import { Doc } from "yjs"
-import { SupaChangesAdapter } from "../core/adapter"
-import { createSupaChangesAdapter } from "../core/helper.js"
-import { Database } from "../database.generated"
-import { SupaChangesContext, UnknownStore } from "./SupaChangesContext"
+import type { SupaChangesAdapter } from "../core/adapter"
+import { createSupaChangesAdapter } from "../core/helper"
+import type { Database } from "../database.generated"
+import { SupaChangesContext, type UnknownStore } from "./SupaChangesContext"
 
 export type Props<T extends UnknownStore> = PropsWithChildren<{
     supabase: SupabaseClient<Database>
@@ -21,7 +21,7 @@ export const SupaChangesContextProvider = <T extends UnknownStore>({
     room,
     storeInitFn,
     Loading,
-}: Props<T>) => {
+}: Props<T>): ReactNode => {
 
     const [state, setState] = useState<{
         store: T
@@ -56,6 +56,9 @@ export const SupaChangesContextProvider = <T extends UnknownStore>({
                     console.warn(error)
                 }
 
+                // Aborted?
+                if (signal.aborted) return
+
                 // Bind valtio store to yjs doc.
                 const unbind = bind(store, ymap)
 
@@ -70,8 +73,8 @@ export const SupaChangesContextProvider = <T extends UnknownStore>({
 
         return () => {
             controller.abort()
-            state?.provider.destroy()
             state?.unbind()
+            state?.provider.destroy()
         }
     }, [room, storeInitFn, supabase])
 

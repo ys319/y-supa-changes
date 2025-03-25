@@ -11,7 +11,7 @@ export const createSupaChangesAdapter = async (
     option: {
         channel?: string
     } = {}
-) => {
+): Promise<SupaChangesAdapter> => {
     const metadata = await supabase
         .schema("y_supa_changes")
         .from("rooms")

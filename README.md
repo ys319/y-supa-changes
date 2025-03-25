@@ -2,6 +2,8 @@
 
 Supabase postgres changes provider for yjs.
 
+## Install
+
 ## Exports
 
 - Core
@@ -15,8 +17,10 @@ Supabase postgres changes provider for yjs.
 ### Core
 
 ```typescript
+import { createSupaChangesAdapter } from "@ys319/y-supa-changes"
+
 // Create adapter.
-// Resolve promise on metadata received.
+// Resolve promise on metadata loaded.
 const provider = await createSupaChangesAdapter(
     supabaseClient,
     room_id,
@@ -33,6 +37,10 @@ await provider.initialize();
 Use `SupabaseChangesContextProvider`. (Too long name. lol)
 
 ```tsx
+import { SupaChangesContextProvider } from "@ys319/y-supa-changes/react"
+
+// ...
+
 <SupaChangesContextProvider<Store>
     supabase={supabase}
     room={workspace}
@@ -46,5 +54,9 @@ Use `SupabaseChangesContextProvider`. (Too long name. lol)
 And use hooks.
 
 ```typescript
+import { useSupaChanges } from "@ys319/y-supa-changes/react"
+
+// ...
+
 const { store } = useSupaChanges<Store>()
 ```

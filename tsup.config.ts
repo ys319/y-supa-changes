@@ -3,9 +3,9 @@ import { defineConfig } from "tsup"
 export default defineConfig({
     // Source
     entry: {
-        "index": "src/index.ts",
+        "mod": "src/mod.ts",
         "react": "src/react.ts",
-        // "func": 
+        "edge": "src/edge.ts",
     },
     outDir: "dist",
 

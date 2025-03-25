@@ -1,9 +1,9 @@
 import { decodeAscii85, decodeBase64, encodeAscii85, encodeBase64 } from "@std/encoding"
-import { REALTIME_SUBSCRIBE_STATES, RealtimeChannel, SupabaseClient } from "@supabase/supabase-js"
-import { Doc, applyUpdate, applyUpdateV2 } from "yjs"
-import { Database } from "../database.generated"
+import type { REALTIME_SUBSCRIBE_STATES, RealtimeChannel, SupabaseClient } from "@supabase/supabase-js"
+import { type Doc, applyUpdate, applyUpdateV2 } from "yjs"
+import type { Database } from "../database.generated"
 import { compress, decompress } from "./compress"
-import { YjsCompress, YjsEncoding, YjsVersion } from "./metadata"
+import type { YjsCompress, YjsEncoding, YjsVersion } from "./metadata"
 
 type RealtimePayload = Database["y_supa_changes"]["Tables"]["updates"]["Insert"]
 
@@ -134,7 +134,7 @@ export class SupaChangesAdapter {
                     this.applyUpdate(payload.new)
                 }
             )
-            .subscribe(async (status) => {
+            .subscribe((status) => {
                 subscribed.resolve(status)
             })
 
@@ -159,28 +159,21 @@ export class SupaChangesAdapter {
         if (signal.aborted) return false
 
         // Fetch all existing updates ordered by autoincrement id
-        const { data, error } = await this.#supabase
-            .schema("y_supa_changes")
-            .from("updates")
-            .select("update")
-            .eq("room_id", this.#room_id)
-            .order("id")
-            .abortSignal(signal)
+        const { data } = await this.#supabase.functions.invoke<{ update: string }>(
+            "sync_init",
+            {
+                body: {
+                    room_id: this.#room_id
+                }
+            }
+        )
 
-        // Case: Failed to fetch state.
-        if (error !== null) {
-            console.warn(error)
+        // Bad data.
+        if (typeof data?.update !== "string") {
             return false
         }
 
-        // Apply all updates in order
-        for (const payload of data) {
-            if (typeof payload.update !== "string") {
-                console.warn("Failed to apply update: ", payload)
-                continue
-            }
-            await this.applyUpdate(payload)
-        }
+        await this.applyUpdate(data)
 
         // Succeed
         return true
@@ -205,6 +198,7 @@ export class SupaChangesAdapter {
     }
 
     destroy() {
+
         // Clean up
         this.#subscription?.unsubscribe()
         if (this.#yjs_version === "v1") {

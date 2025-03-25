@@ -1,7 +1,11 @@
 import { useContext } from "react"
-import { SupaChangesContext, UnknownStore } from "./SupaChangesContext"
+import type { Doc } from "yjs"
+import { SupaChangesContext, type UnknownStore } from "./SupaChangesContext"
 
-export const useSupaChanges = <T extends UnknownStore>() => {
+export const useSupaChanges = <T extends UnknownStore>(): {
+    store: T
+    ydoc: Doc
+} => {
     const context = useContext(SupaChangesContext)
 
     // Case: Failed to get context.
