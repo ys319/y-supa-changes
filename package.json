@@ -1,7 +1,7 @@
 {
   "name": "@ys319/y-supa-changes",
   "description": "Yjs provider for Supabase Postgres Changes",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "license": "MIT",
   "homepage": "https://github.com/ys319/y-supa-changes",
   "repository": {
